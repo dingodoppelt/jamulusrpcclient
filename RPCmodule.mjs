@@ -9,6 +9,28 @@ export default class jamulusRpcInterface {
         this.#authenticated = false;
         this.#RPCPORT = RPCPORT;
         this.#RPCHOST = '127.0.0.1';
+        this.AvailableMethods = [
+            'jamulus/getMode',
+            'jamulus/getVersion',
+            'jamulusserver/broadcastChatMessage',
+            'jamulusserver/privateChatMessage',
+            'jamulusserver/getClients',
+            'jamulusserver/getRecorderStatus',
+            'jamulusserver/getServerProfile',
+            'jamulusserver/getStreamStatus',
+            'jamulusserver/restartRecording',
+            'jamulusserver/setDirectory',
+            'jamulusserver/setRecordingDirectory',
+            'jamulusserver/setServerName',
+            'jamulusserver/setStreamDestination',
+            'jamulusserver/setWelcomeMessage',
+            'jamulusserver/startRecording',
+            'jamulusserver/startStream',
+            'jamulusserver/stopRecording',
+            'jamulusserver/stopStream',
+            'jamulusserver/toggleStream'
+        ]
+        
         this.#SECRET = readFileSync(SECRET_file, 'utf8', (err, data) => {
             if (err) {
                 console.error(err);
@@ -30,7 +52,6 @@ export default class jamulusRpcInterface {
                             this.#authenticated = true;
                             this.jamRPCServer.write(`{"id":"Mode","jsonrpc":"2.0","method":"jamulus/getMode","params":{}}\n`);
                             this.jamRPCServer.write(`{"id":"Version","jsonrpc":"2.0","method":"jamulus/getVersion","params":{}}\n`);
-                            this.jamRPCServer.write(`{"id":"AvailableMethods","jsonrpc":"2.0","method":"jamulus/getAvailableMethods","params":{}}\n`);
                             this.jamRPCServer.once('data', (data) => {
                                 data = data.toString().split('\n');
                                 data.forEach( (row) => {
@@ -39,11 +60,6 @@ export default class jamulusRpcInterface {
                                     } else { return; };
                                     if (row.length != 0) {
                                         switch (row.id) {
-                                            case 'AvailableMethods':
-                                                this.AvailableMethods = row.result.methods;
-                                                console.log('Available methods: ');
-                                                console.log(this.AvailableMethods);
-                                                break;
                                             case 'Version':
                                                 this.version = row.result.version;
                                                 console.log('Version: ' + this.version);
